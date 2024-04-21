@@ -1,10 +1,10 @@
-import { config } from "./config";
-import { getEvents } from "./get-events";
-import { getInitialState } from "./initial-state";
-import { processRewardEvent } from "./rewards";
-import { UserList } from "./types";
+import { config } from './config';
+import { getEvents } from './get-events';
+import { getInitialState } from './initial-state';
+import { processRewardEvent } from './rewards';
+import { UserList } from './types';
 
-import { exportResults, getSafeOwnerMapping } from "./utils";
+import { exportResults, getSafeOwnerMapping } from './utils';
 
 const main = async () => {
   // Get end user owners of safe handle
