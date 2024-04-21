@@ -48,7 +48,7 @@ export const exportResults = (users: UserList) => {
   for (let u of userReward) {
     w += `${u[0]},${u[1]}\n`;
   }
-  const fileName = `hai-weth-lp-${config().OUTPUT_FILE}-rewards.csv`;
+  const fileName = `hai-weth-lp-${config().REWARD_TOKEN}-rewards.csv`;
   fs.writeFileSync(fileName, w);
 };
 

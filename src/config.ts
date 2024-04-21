@@ -6,7 +6,6 @@ export const config = () => {
   const envs = process.env as any;
   return {
     GEB_SUBGRAPH_URL: envs.GEB_SUBGRAPH_URL,
-    OUTPUT_FILE: envs.OUTPUT_FILE,
     REWARD_TOKEN: envs.REWARD_TOKEN,
     UNISWAP_SUBGRAPH_URL: envs.UNISWAP_SUBGRAPH_URL,
     UNISWAP_POOL_ADDRESS: envs.UNISWAP_POOL_ADDRESS.toLowerCase(),
