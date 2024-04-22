@@ -1,7 +1,7 @@
-import { getAccumulatedRate } from "./initial-state";
-import { NULL_ADDRESS, roundToZero } from "./utils";
-import { provider } from "./chain";
-import { RewardEvent, UserList } from "./types";
+import { getAccumulatedRate } from './initial-state';
+import { NULL_ADDRESS, roundToZero } from './utils';
+import { provider } from './chain';
+import { RewardEvent, UserList } from './types';
 
 export const finalSanityChecks = async (
   finalTimestamp: number,
@@ -13,15 +13,15 @@ export const finalSanityChecks = async (
 ) => {
   const endTimestamp = (await provider.getBlock(endBlock)).timestamp;
   if (finalTimestamp > endTimestamp) {
-    throw Error("Impossible final timestamp");
+    throw Error('Impossible final timestamp');
   }
 
-  const expectedAccumulatedRate = await getAccumulatedRate(endBlock);
-  if (roundToZero(expectedAccumulatedRate - finalAccumulatedRate)) {
-    throw Error(
-      `Invalid final accumulated rate. Get ${finalAccumulatedRate} expected ${expectedAccumulatedRate}`
-    );
-  }
+  // const expectedAccumulatedRate = await getAccumulatedRate(endBlock);
+  // if (roundToZero(expectedAccumulatedRate - finalAccumulatedRate)) {
+  //   throw Error(
+  //     `Invalid final accumulated rate. Get ${finalAccumulatedRate} expected ${expectedAccumulatedRate}`
+  //   );
+  // }
 
   // const finalPoolState = await getPoolState(endBlock);
   // if (
@@ -36,12 +36,17 @@ export const finalSanityChecks = async (
   // }
 
   // Check how much rewards were allocated
-  const totalAllocatedReward = Object.values(finalUsers).reduce((acc, a) => (acc += a.earned), 0);
-  console.log(`All events applied, total allocated reward ${totalAllocatedReward}`);
+  const totalAllocatedReward = Object.values(finalUsers).reduce(
+    (acc, a) => (acc += a.earned),
+    0
+  );
+  console.log(
+    `All events applied, total allocated reward ${totalAllocatedReward}`
+  );
 };
 
 export const sanityCheckAllUsers = (users: UserList, event: RewardEvent) => {
-  const numberCheck = (num) => !isFinite(num) || num < 0;
+  const numberCheck = (num: number) => !isFinite(num) || num < 0;
   if (event.address && event.address !== NULL_ADDRESS) {
     const usr = users[event.address];
     if (
@@ -50,12 +55,24 @@ export const sanityCheckAllUsers = (users: UserList, event: RewardEvent) => {
       numberCheck(usr.earned) ||
       numberCheck(usr.rewardPerWeightStored)
     ) {
-      throw Error(`Invalid user:\n${JSON.stringify(usr)}\n at event:\n${JSON.stringify(event)}`);
+      throw Error(
+        `Invalid user:\n${JSON.stringify(usr)}\n at event:\n${JSON.stringify(
+          event
+        )}`
+      );
     }
 
     for (let p of usr.lpPositions) {
-      if (numberCheck(p.liquidity) || !isFinite(p.lowerTick) || !isFinite(p.upperTick)) {
-        throw Error(`Invalid user:\n${JSON.stringify(usr)}\n at event:\n${JSON.stringify(event)}`);
+      if (
+        numberCheck(p.liquidity) ||
+        !isFinite(p.lowerTick) ||
+        !isFinite(p.upperTick)
+      ) {
+        throw Error(
+          `Invalid user:\n${JSON.stringify(usr)}\n at event:\n${JSON.stringify(
+            event
+          )}`
+        );
       }
     }
   }

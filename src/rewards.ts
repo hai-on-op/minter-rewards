@@ -1,18 +1,22 @@
-import { config } from "./config";
-import { getAccumulatedRate } from "./initial-state";
+import { config } from './config';
+import { getAccumulatedRate } from './initial-state';
 import {
   LpPosition,
   RewardEvent,
   RewardEventType,
   UserAccount,
-  UserList
-} from "./types";
-import { getOrCreateUser } from "./utils";
-import { provider } from "./chain";
-import { sanityCheckAllUsers } from "./sanity-checks";
-import { getStakingWeight } from "./staking-weight";
-import { getPoolState, getRedemptionPriceFromTimestamp } from "./subgraph";
-import * as fs from "fs";
+  UserList,
+  Rates
+} from './types';
+import { getOrCreateUser } from './utils';
+import { provider } from './chain';
+import { sanityCheckAllUsers } from './sanity-checks';
+import { getStakingWeight } from './staking-weight';
+import { getPoolState, getRedemptionPriceFromTimestamp } from './subgraph';
+import * as fs from 'fs';
+import { get } from 'http';
+
+export const CTYPES = ['OP', 'WETH', 'WSTETH'];
 
 export const processRewardEvent = async (
   users: UserList,
@@ -35,7 +39,7 @@ export const processRewardEvent = async (
   // Ongoing cumulative reward per weight over time
   let rewardPerWeight = 0;
 
-  let updateRewardPerWeight = evtTime => {
+  let updateRewardPerWeight = (evtTime: number) => {
     if (totalStakingWeight > 0) {
       const deltaTime = evtTime - timestamp;
       rewardPerWeight += (deltaTime * rewardRate) / totalStakingWeight;
@@ -46,7 +50,12 @@ export const processRewardEvent = async (
   let timestamp = startTimestamp;
 
   // Ongoing accumulated rate
-  let accumulatedRate = await getAccumulatedRate(startBlock);
+  const rates: Rates = {};
+  for (let i = 0; i < CTYPES.length; i++) {
+    const cType = CTYPES[i];
+    const cTypeRate = await getAccumulatedRate(startBlock, cType);
+    rates[cType] = cTypeRate;
+  }
 
   // Ongoing uni v3 sqrtPrice
   let sqrtPrice = (
@@ -54,7 +63,8 @@ export const processRewardEvent = async (
   ).sqrtPrice;
 
   // Ongoing redemption price
-  let redemptionPrice: number;
+  let redemptionPrice: number = 1; // Initialize with default value
+
   let redemptionPriceLastUpdate = 0;
   // ===== Main processing loop ======
 
@@ -63,7 +73,7 @@ export const processRewardEvent = async (
       config().REWARD_AMOUNT
     } at a reward rate of ${rewardRate}/sec between ${startTimestamp} and ${endTimestamp}`
   );
-  console.log("Applying all events...");
+  console.log('Applying all events...');
   // Main processing loop processing events in chronologic order that modify the current reward rate distribution for each user.
 
   for (let i = 0; i < events.length; i++) {
@@ -85,8 +95,10 @@ export const processRewardEvent = async (
     // The way the rewards are credited is different for each event type
     switch (event.type) {
       case RewardEventType.DELTA_DEBT: {
-        const user = getOrCreateUser(event.address, users);
+        const user = getOrCreateUser(event.address ?? '', users);
         earn(user, rewardPerWeight);
+
+        const accumulatedRate = rates[event.cType as string];
 
         // Convert to real debt after interests and update the debt balance
         const adjustedDeltaDebt = (event.value as number) * accumulatedRate;
@@ -107,7 +119,7 @@ export const processRewardEvent = async (
       }
       case RewardEventType.POOL_POSITION_UPDATE: {
         const updatedPosition = event.value as LpPosition;
-        const user = getOrCreateUser(event.address, users);
+        const user = getOrCreateUser(event.address ?? '', users);
         earn(user, rewardPerWeight);
 
         // Detect the special of a simple NFT transfer (not form a mint/burn/modify position)
@@ -117,7 +129,7 @@ export const processRewardEvent = async (
               users[u].lpPositions[p].tokenId === updatedPosition.tokenId &&
               u !== event.address
             ) {
-              console.log("ERC721 transfer");
+              console.log('ERC721 transfer');
               // We found the source address of an ERC721 transfer
               earn(users[u], rewardPerWeight);
               users[u].lpPositions = users[u].lpPositions.filter(
@@ -189,7 +201,8 @@ export const processRewardEvent = async (
       case RewardEventType.UPDATE_ACCUMULATED_RATE: {
         // Update accumulated rate increases everyone's debt by the rate multiplier
         const rateMultiplier = event.value as number;
-        accumulatedRate += rateMultiplier;
+        const cTypeRate = rates[event.cType as string];
+        rates[event.cType as string] = cTypeRate + rateMultiplier;
 
         // First credit all users
         Object.values(users).map(u => earn(u, rewardPerWeight));
@@ -209,7 +222,7 @@ export const processRewardEvent = async (
         break;
       }
       default:
-        throw Error("Unknown event");
+        throw Error('Unknown event');
     }
 
     sanityCheckAllUsers(users, event);

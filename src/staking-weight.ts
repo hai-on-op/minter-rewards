@@ -1,10 +1,10 @@
-import { LpPosition, UserList } from "./types";
+import { LpPosition } from './types';
 
 const RAI_IS_TOKEN_0 = true;
-const MINIMUM_TICK_WIDTH = 50;
 
-const fullRangeLowerTick = -887270;
-const fullRangeUpperTick = 887270;
+// Full range positions on OP Uniswap v3
+const fullRangeLowerTick = -887220;
+const fullRangeUpperTick = 887220;
 
 export const getStakingWeight = (
   debt: number,
@@ -65,7 +65,11 @@ export const getTokenAmountsFromLp = (lp: LpPosition, sqrtPrice: number) => {
   return [token0Amt, token1Amt];
 };
 
-const isInRange = (lp: LpPosition, sqrtPrice, redemptionPrice: number) => {
+const isInRange = (
+  lp: LpPosition,
+  sqrtPrice: number,
+  redemptionPrice: number
+) => {
   const tickMarketPrice = sqrtPriceToTick(sqrtPrice);
   const tickRedemptionPrice = sqrtPriceToAdjustedTick(
     priceToSqrtPrice(redemptionPrice)
@@ -81,7 +85,7 @@ const isInRange = (lp: LpPosition, sqrtPrice, redemptionPrice: number) => {
 const isFullRange = (lp: LpPosition) =>
   lp.lowerTick === fullRangeLowerTick && lp.upperTick === fullRangeUpperTick;
 
-const sqrtPriceToTick = sqrtPrice =>
+const sqrtPriceToTick = (sqrtPrice: number) =>
   Math.log(sqrtPrice / 2 ** 96) / Math.log(Math.sqrt(1.0001));
 
 const tickToSqrtPrice = (tick: number) => 1.0001 ** (tick / 2);
