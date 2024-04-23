@@ -28,7 +28,11 @@ export const getOrCreateUser = (
 export const roundToZero = (num: number) => (Math.abs(num) < 1e-8 ? 0 : num);
 
 // Export results in a CSV file
-export const exportResults = (users: UserList) => {
+export const exportResults = (
+  users: UserList,
+  rewardToken: string,
+  cType: string
+) => {
   // Export results in an array
   let userReward: [string, number][] = Object.entries(users).map(kv => [
     kv[0],
@@ -48,7 +52,7 @@ export const exportResults = (users: UserList) => {
   for (let u of userReward) {
     w += `${u[0]},${u[1]}\n`;
   }
-  const fileName = `hai-weth-lp-${config().REWARD_TOKEN}-rewards.csv`;
+  const fileName = `./output/mint-reward_token-${rewardToken}_collateral-${cType}.csv`;
   fs.writeFileSync(fileName, w);
 };
 

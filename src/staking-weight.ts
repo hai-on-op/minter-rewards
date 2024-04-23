@@ -12,17 +12,18 @@ export const getStakingWeight = (
   sqrtPrice: number,
   redemptionPrice: number
 ): number => {
+  return debt;
   // Remove positions that are not full range
-  const filteredPositions = positions.filter(p => {
-    return (
-      p.lowerTick === fullRangeLowerTick && p.upperTick === fullRangeUpperTick
-    );
-  });
+  // const filteredPositions = positions.filter(p => {
+  //   return (
+  //     p.lowerTick === fullRangeLowerTick && p.upperTick === fullRangeUpperTick
+  //   );
+  // });
 
-  const totalLiquidity = filteredPositions.reduce((acc, p) => {
-    return acc + (isFullRange(p) ? p.liquidity : 0);
-  }, 0);
-  return totalLiquidity;
+  // const totalLiquidity = filteredPositions.reduce((acc, p) => {
+  //   return acc + (isFullRange(p) ? p.liquidity : 0);
+  // }, 0);
+  // return totalLiquidity;
 };
 
 export const getPositionSize = (
