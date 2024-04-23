@@ -20,7 +20,8 @@ export const CTYPES = ['OP', 'WETH', 'WSTETH'];
 
 export const processRewardEvent = async (
   users: UserList,
-  events: RewardEvent[]
+  events: RewardEvent[],
+  rewardAmount: number
 ): Promise<UserList> => {
   // Starting and ending of the campaign
   const startBlock = config().START_BLOCK;
@@ -29,12 +30,10 @@ export const processRewardEvent = async (
   const endTimestamp = (await provider.getBlock(endBlock)).timestamp;
 
   // Constant amount of reward distributed per second
-  const rewardRate = config().REWARD_AMOUNT / (endTimestamp - startTimestamp);
+  const rewardRate = rewardAmount / (endTimestamp - startTimestamp);
 
   // Ongoing Total supply of weight
   let totalStakingWeight = sumAllWeights(users);
-
-  console.log(`Total staking weight: ${totalStakingWeight}`);
 
   // Ongoing cumulative reward per weight over time
   let rewardPerWeight = 0;
@@ -69,9 +68,7 @@ export const processRewardEvent = async (
   // ===== Main processing loop ======
 
   console.log(
-    `Distributing ${
-      config().REWARD_AMOUNT
-    } at a reward rate of ${rewardRate}/sec between ${startTimestamp} and ${endTimestamp}`
+    `Distributing ${rewardAmount} at a reward rate of ${rewardRate}/sec between ${startTimestamp} and ${endTimestamp}`
   );
   console.log('Applying all events...');
   // Main processing loop processing events in chronologic order that modify the current reward rate distribution for each user.
@@ -108,94 +105,12 @@ export const processRewardEvent = async (
         if (user.debt < 0 && user.debt > -0.4) {
           user.debt = 0;
         }
-
         user.stakingWeight = getStakingWeight(
           user.debt,
           user.lpPositions,
           sqrtPrice,
           redemptionPrice
         );
-        break;
-      }
-      case RewardEventType.POOL_POSITION_UPDATE: {
-        const updatedPosition = event.value as LpPosition;
-        const user = getOrCreateUser(event.address ?? '', users);
-        earn(user, rewardPerWeight);
-
-        // Detect the special of a simple NFT transfer (not form a mint/burn/modify position)
-        for (let u of Object.keys(users)) {
-          for (let p in users[u].lpPositions) {
-            if (
-              users[u].lpPositions[p].tokenId === updatedPosition.tokenId &&
-              u !== event.address
-            ) {
-              console.log('ERC721 transfer');
-              // We found the source address of an ERC721 transfer
-              earn(users[u], rewardPerWeight);
-              users[u].lpPositions = users[u].lpPositions.filter(
-                x => x.tokenId !== updatedPosition.tokenId
-              );
-              users[u].stakingWeight = getStakingWeight(
-                users[u].debt,
-                users[u].lpPositions,
-                sqrtPrice,
-                redemptionPrice
-              );
-            }
-          }
-        }
-        // Create or update the position
-        const index = user.lpPositions.findIndex(
-          p => p.tokenId === updatedPosition.tokenId
-        );
-        if (index === -1) {
-          user.lpPositions.push({
-            tokenId: updatedPosition.tokenId,
-            lowerTick: updatedPosition.lowerTick,
-            upperTick: updatedPosition.upperTick,
-            liquidity: updatedPosition.liquidity
-          });
-        } else {
-          user.lpPositions[index].liquidity = updatedPosition.liquidity;
-
-          // Sanity check
-          if (
-            user.lpPositions[index].lowerTick !== updatedPosition.lowerTick ||
-            user.lpPositions[index].upperTick !== updatedPosition.upperTick
-          ) {
-            throw Error("Tick value can't be updated");
-          }
-        }
-
-        // Update that user staking weight
-        user.stakingWeight = getStakingWeight(
-          user.debt,
-          user.lpPositions,
-          sqrtPrice,
-          redemptionPrice
-        );
-
-        break;
-      }
-      case RewardEventType.POOL_SWAP: {
-        // Pool swap changes the price which affects everyone's staking weight
-
-        // First credit all users
-        Object.values(users).map(u => earn(u, rewardPerWeight));
-
-        sqrtPrice = event.value as number;
-
-        // Then update everyone weight
-        Object.values(users).map(
-          u =>
-            (u.stakingWeight = getStakingWeight(
-              u.debt,
-              u.lpPositions,
-              sqrtPrice,
-              redemptionPrice
-            ))
-        );
-
         break;
       }
       case RewardEventType.UPDATE_ACCUMULATED_RATE: {

@@ -8,15 +8,14 @@ import { getExclusionList, getSafeOwnerMapping, NULL_ADDRESS } from './utils';
 export const getEvents = async (
   startBlock: number,
   endBlock: number,
-  owners: Map<string, string>
+  owners: Map<string, string>,
+  cType: string
 ) => {
   console.log(`Fetch events ...`);
 
   const res = await Promise.all([
-    getSafeModificationEvents(startBlock, endBlock, owners),
-    getPoolPositionUpdate(startBlock, endBlock),
-    getPoolSwap(startBlock, endBlock),
-    getUpdateAccumulatedRateEvent(startBlock, endBlock)
+    getSafeModificationEvents(startBlock, endBlock, owners, cType),
+    getUpdateAccumulatedRateEvent(startBlock, endBlock, cType)
   ]);
 
   // Merge all events
@@ -77,7 +76,8 @@ export const getEvents = async (
 const getSafeModificationEvents = async (
   start: number,
   end: number,
-  ownerMapping: Map<string, string>
+  ownerMapping: Map<string, string>,
+  cType: string
 ): Promise<RewardEvent[]> => {
   // We several kind of modifications
 
@@ -93,7 +93,7 @@ const getSafeModificationEvents = async (
 
   // Main event to modify a safe
   const safeModificationQuery = `{
-      modifySAFECollateralizations(where: {createdAtBlock_gte: ${start}, createdAtBlock_lte: ${end}, deltaDebt_not: 0}, first: 1000, skip: [[skip]]) {
+      modifySAFECollateralizations(where: {createdAtBlock_gte: ${start}, collateralType: "${cType}", createdAtBlock_lte: ${end}, deltaDebt_not: 0}, first: 1000, skip: [[skip]]) {
         id
         deltaDebt
         safeHandler
@@ -113,7 +113,7 @@ const getSafeModificationEvents = async (
 
   // Event used in liquidation
   const confiscateSAFECollateralAndDebtsQuery = `{
-    confiscateSAFECollateralAndDebts(where: {createdAtBlock_gte: ${start}, createdAtBlock_lte: ${end}, deltaDebt_not: 0}, first: 1000, skip: [[skip]]) {
+    confiscateSAFECollateralAndDebts(where: {createdAtBlock_gte: ${start}, collateralType: "${cType}", createdAtBlock_lte: ${end}, deltaDebt_not: 0}, first: 1000, skip: [[skip]]) {
       id
       deltaDebt
       safeHandler
@@ -133,7 +133,7 @@ const getSafeModificationEvents = async (
 
   // Event transferring debt, rarely used
   const transferSAFECollateralAndDebtsQuery = `{
-    transferSAFECollateralAndDebts(where: {createdAtBlock_gte: ${start}, createdAtBlock_lte: ${end}, deltaDebt_not: 0}, first: 1000, skip: [[skip]]) {
+    transferSAFECollateralAndDebts(where: {createdAtBlock_gte: ${start}, collateralType: "${cType}", createdAtBlock_lte: ${end}, deltaDebt_not: 0}, first: 1000, skip: [[skip]]) {
       id
       deltaDebt
       createdAt
@@ -203,114 +203,13 @@ const getSafeModificationEvents = async (
   return events;
 };
 
-const getPoolPositionUpdate = async (
-  start: number,
-  end: number
-): Promise<RewardEvent[]> => {
-  const query = `{
-    positionSnapshots(where: {blockNumber_gte: ${start}, blockNumber_lte: ${end}, pool : "${
-    config().UNISWAP_POOL_ADDRESS
-  }"}, first: 1000, skip: [[skip]]) {
-      owner
-      timestamp
-      liquidity
-      position {
-        id
-        tickLower {
-          tickIdx
-        }
-        tickUpper {
-          tickIdx
-        }
-      }
-    }
-  }`;
-
-  const snapshots: {
-    owner: string;
-    timestamp: string;
-    liquidity: string;
-    position: {
-      id: string;
-      tickLower: {
-        tickIdx: string;
-      };
-      tickUpper: {
-        tickIdx: string;
-      };
-    };
-  }[] = await subgraphQueryPaginated(
-    query,
-    'positionSnapshots',
-    config().UNISWAP_SUBGRAPH_URL
-  );
-  let events: RewardEvent[] = [];
-
-  for (let position of snapshots) {
-    events.push({
-      type: RewardEventType.POOL_POSITION_UPDATE,
-      value: {
-        tokenId: Number(position.position.id),
-        upperTick: Number(position.position.tickUpper.tickIdx),
-        lowerTick: Number(position.position.tickLower.tickIdx),
-        liquidity: Number(position.liquidity)
-      },
-      address: position.owner,
-      logIndex: 1e6,
-      timestamp: Number(position.timestamp)
-    });
-  }
-
-  console.log(`  Fetched ${events.length} position update events`);
-
-  return events;
-};
-
-const getPoolSwap = async (
-  start: number,
-  end: number
-): Promise<RewardEvent[]> => {
-  const [startTime, endTime] = await Promise.all([
-    blockToTimestamp(start),
-    blockToTimestamp(end)
-  ]);
-
-  const query = `{
-    swaps(where: {pool:"${
-      config().UNISWAP_POOL_ADDRESS
-    }", timestamp_gte: ${startTime}, timestamp_lte: ${endTime}}, first: 1000, skip:[[skip]]){
-      sqrtPriceX96
-      timestamp
-      logIndex
-    }
-  }`;
-
-  const data: {
-    sqrtPriceX96: string;
-    timestamp: string;
-    logIndex: string;
-  }[] = await subgraphQueryPaginated(
-    query,
-    'swaps',
-    config().UNISWAP_SUBGRAPH_URL
-  );
-
-  const events = data.map(x => ({
-    type: RewardEventType.POOL_SWAP,
-    value: Number(x.sqrtPriceX96),
-    logIndex: Number(x.logIndex),
-    timestamp: Number(x.timestamp)
-  }));
-  console.log(`  Fetched ${events.length} Uniswap swap events`);
-  return events;
-};
-
 const getUpdateAccumulatedRateEvent = async (
   start: number,
-  end: number
+  end: number,
+  cType: string
 ): Promise<RewardEvent[]> => {
   const query = `{
-            updateAccumulatedRates(orderBy: accumulatedRate, orderDirection: desc where: {createdAtBlock_gte: ${start}, createdAtBlock_lte: ${end}}, first: 1000, skip: [[skip]]) {
+            updateAccumulatedRates(orderBy: accumulatedRate, orderDirection: desc where: {createdAtBlock_gte: ${start}, collateralType: "${cType}", createdAtBlock_lte: ${end}}, first: 1000, skip: [[skip]]) {
               id
               rateMultiplier
               createdAt
