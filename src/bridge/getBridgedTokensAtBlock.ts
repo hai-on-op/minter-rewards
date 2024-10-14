@@ -1,4 +1,4 @@
-import bridgedAmountsDetailed from "./bridged_amounts_detailed.json";
+import bridgedAmountsDetailed from "../../bridged_amounts_detailed.json";
 import { ethers } from "ethers";
 
 export function getBridgedTokensAtBlock(

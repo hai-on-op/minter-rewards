@@ -69,7 +69,7 @@
       },
       {
         "bridgeName": "Standard Bridge",
-        "token": "reth",
+        "token": "RETH",
         "amount": "8000000000000000000",
         "blockHeight": 125775218
       },
@@ -588,5 +588,40 @@
   {
     "address": "0x2f1ea6322c976925f5121674196a364c05a2eec9",
     "bridgeTransactions": []
+  },
+  {
+    "address": "0x97525526C3Fcc9DA8a5109A7fbd49034fA13BED7",
+    "bridgeTransactions": [
+      {
+        "bridgeName": "Standard Bridge",
+        "token": "RETH",
+        "amount": "5000000000000000",
+        "blockHeight": 126335341
+      },
+      {
+        "bridgeName": "Standard Bridge",
+        "token": "RETH",
+        "amount": "5000000000000000",
+        "blockHeight": 126334866
+      },
+      {
+        "bridgeName": "apxETH Bridge",
+        "token": "apxETH",
+        "amount": "11839000000000000",
+        "blockHeight": 126336087
+      },
+      {
+        "bridgeName": "Hop Bridge",
+        "token": "rETH",
+        "amount": "4990984508711212",
+        "blockHeight": 126335923
+      },
+      {
+        "bridgeName": "Lido Bridge",
+        "token": "wstETH",
+        "amount": "5000000000000000",
+        "blockHeight": 126335516
+      }
+    ]
   }
 ]
