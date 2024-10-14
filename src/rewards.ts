@@ -151,9 +151,11 @@ export const processRewardEvent = async (
         Object.values(users).map((u) => (u.debt *= rateMultiplier + 1));
 
         Object.values(users).map((u) => {
+          // calculating userEffectiveBridgedTokens
           const userEffectiveBridgedTokens =
             u.totalBridgedTokens - u.usedBridgedTokens;
 
+            
           u.stakingWeight = getStakingWeight(
             u.debt,
             userEffectiveBridgedTokens,
