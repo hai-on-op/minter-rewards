@@ -97,7 +97,7 @@ export const processRewardEvent = async (
         earn(user, rewardPerWeight);
 
         // setting user totalBridgedTokens
-        user.totalBridgedTokens += getBridgedTokensAtBlock(
+        user.totalBridgedTokens = getBridgedTokensAtBlock(
           event.address,
           event.cType,
           event.createdAtBlock
@@ -137,7 +137,7 @@ export const processRewardEvent = async (
         // setting user totalBridgedTokens
         Object.values(users).map(
           (u) =>
-            (u.totalBridgedTokens += getBridgedTokensAtBlock(
+            (u.totalBridgedTokens = getBridgedTokensAtBlock(
               u.address,
               event.cType,
               event.createdAtBlock
@@ -155,7 +155,6 @@ export const processRewardEvent = async (
           const userEffectiveBridgedTokens =
             u.totalBridgedTokens - u.usedBridgedTokens;
 
-            
           u.stakingWeight = getStakingWeight(
             u.debt,
             userEffectiveBridgedTokens,
