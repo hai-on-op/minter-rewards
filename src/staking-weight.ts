@@ -1,4 +1,4 @@
-import { LpPosition } from './types';
+import { LpPosition } from "./types";
 
 const RAI_IS_TOKEN_0 = true;
 
@@ -8,11 +8,12 @@ const fullRangeUpperTick = 887220;
 
 export const getStakingWeight = (
   debt: number,
+  effectiveBridgedTokens: number,
   positions: LpPosition[],
   sqrtPrice: number,
   redemptionPrice: number
 ): number => {
-  return debt;
+  return debt > effectiveBridgedTokens ? effectiveBridgedTokens : debt;
   // Remove positions that are not full range
   // const filteredPositions = positions.filter(p => {
   //   return (

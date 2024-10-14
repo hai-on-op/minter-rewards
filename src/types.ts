@@ -1,10 +1,13 @@
 // For a single user
 export type UserAccount = {
+  address: string;
   debt: number;
   lpPositions: LpPosition[];
   stakingWeight: number;
   rewardPerWeightStored: number;
   earned: number;
+  totalBridgedTokens: number;
+  usedBridgedTokens: number;
 };
 
 // Main data structure
@@ -28,6 +31,7 @@ export type RewardEvent = {
   address?: string;
   value: number | LpPosition;
   timestamp: number;
+  createdAtBlock: number;
   logIndex: number;
   cType?: string;
 };
