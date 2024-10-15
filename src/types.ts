@@ -2,6 +2,7 @@
 export type UserAccount = {
   address: string;
   debt: number;
+  collateral: number;
   lpPositions: LpPosition[];
   stakingWeight: number;
   rewardPerWeightStored: number;
@@ -30,6 +31,7 @@ export type RewardEvent = {
   type: RewardEventType;
   address?: string;
   value: number | LpPosition;
+  complementaryValue?: number;
   timestamp: number;
   createdAtBlock: number;
   logIndex: number;

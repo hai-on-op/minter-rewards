@@ -22,7 +22,8 @@ export const CTYPES = ["WSTETH", "RETH", "APXETH"];
 export const processRewardEvent = async (
   users: UserList,
   events: RewardEvent[],
-  rewardAmount: number
+  rewardAmount: number,
+  withBridge: boolean
 ): Promise<UserList> => {
   // Starting and ending of the campaign
   const startBlock = config().START_BLOCK;
@@ -87,6 +88,8 @@ export const processRewardEvent = async (
 
     updateRewardPerWeight(event.timestamp);
 
+    const rewardsDistributed = rewardRate * (event.timestamp - startTimestamp);
+
     // Increment time
     timestamp = event.timestamp;
 
@@ -109,23 +112,20 @@ export const processRewardEvent = async (
         const adjustedDeltaDebt = (event.value as number) * accumulatedRate;
         user.debt += adjustedDeltaDebt;
 
+        user.collateral += event.complementaryValue;
+
         // Ignore Dusty debt
         if (user.debt < 0 && user.debt > -0.4) {
           user.debt = 0;
         }
 
-        const userEffectiveBridgedTokens =
-          user.totalBridgedTokens - user.usedBridgedTokens;
-
         user.stakingWeight = getStakingWeight(
           user.debt,
-          userEffectiveBridgedTokens,
-          user.lpPositions,
-          sqrtPrice,
-          redemptionPrice
+          user.collateral,
+          user.totalBridgedTokens,
+          withBridge
         );
 
-        user.usedBridgedTokens += user.stakingWeight;
         break;
       }
       case RewardEventType.UPDATE_ACCUMULATED_RATE: {
@@ -152,18 +152,14 @@ export const processRewardEvent = async (
 
         Object.values(users).map((u) => {
           // calculating userEffectiveBridgedTokens
-          const userEffectiveBridgedTokens =
-            u.totalBridgedTokens - u.usedBridgedTokens;
+          const userEffectiveBridgedTokens = u.totalBridgedTokens; //- u.usedBridgedTokens;
 
           u.stakingWeight = getStakingWeight(
             u.debt,
+            u.collateral,
             userEffectiveBridgedTokens,
-            u.lpPositions,
-            sqrtPrice,
-            redemptionPrice
+            withBridge
           );
-
-          u.usedBridgedTokens += u.stakingWeight;
         });
         break;
       }
@@ -182,6 +178,7 @@ export const processRewardEvent = async (
     // )},${users[u].stakingWeight},${totalStakingWeight},${users[u].earned}\n`)
 
     // Recalculate the sum of weights since the events the weights
+
     totalStakingWeight = sumAllWeights(users);
   }
 
@@ -204,4 +201,6 @@ const earn = (user: UserAccount, rewardPerWeight: number) => {
 
 // Simply sum all the stakingWeight of all users
 const sumAllWeights = (users: UserList) =>
-  Object.values(users).reduce((acc, user) => acc + user.stakingWeight, 0);
+  Object.values(users).reduce((acc, user) => {
+    return acc + user.stakingWeight;
+  }, 0);

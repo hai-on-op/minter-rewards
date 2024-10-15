@@ -86,6 +86,7 @@ const getSafeModificationEvents = async (
   type SubgraphSafeModification = {
     id: string;
     deltaDebt: string;
+    deltaCollateral: string;
     createdAt: string;
     createdAtBlock: string;
     safeHandler: string;
@@ -99,6 +100,7 @@ const getSafeModificationEvents = async (
       modifySAFECollateralizations(where: {createdAtBlock_gte: ${start}, collateralType: "${cType}", createdAtBlock_lte: ${end}, deltaDebt_not: 0}, first: 1000, skip: [[skip]]) {
         id
         deltaDebt
+        deltaCollateral
         safeHandler
         createdAt
         createdAtBlock
@@ -120,6 +122,7 @@ const getSafeModificationEvents = async (
     confiscateSAFECollateralAndDebts(where: {createdAtBlock_gte: ${start}, collateralType: "${cType}", createdAtBlock_lte: ${end}, deltaDebt_not: 0}, first: 1000, skip: [[skip]]) {
       id
       deltaDebt
+      deltaCollateral
       safeHandler
       createdAt
       createdAtBlock
@@ -141,6 +144,7 @@ const getSafeModificationEvents = async (
     transferSAFECollateralAndDebts(where: {createdAtBlock_gte: ${start}, collateralType: "${cType}", createdAtBlock_lte: ${end}, deltaDebt_not: 0}, first: 1000, skip: [[skip]]) {
       id
       deltaDebt
+      deltaCollateral
       createdAt
       createdAtBlock
       srcHandler
@@ -154,6 +158,7 @@ const getSafeModificationEvents = async (
   const transferSAFECollateralAndDebts: {
     id: string;
     deltaDebt: string;
+    deltaCollateral: string;
     createdAt: string;
     createdAtBlock: string;
     srcHandler: string;
@@ -170,6 +175,7 @@ const getSafeModificationEvents = async (
     transferSAFECollateralAndDebtsProcessed.push({
       id: t.id,
       deltaDebt: t.deltaDebt,
+      deltaCollateral: t.deltaCollateral,
       safeHandler: t.dstHandler,
       createdAt: t.createdAt,
       createdAtBlock: t.createdAtBlock,
@@ -178,6 +184,7 @@ const getSafeModificationEvents = async (
     transferSAFECollateralAndDebtsProcessed.push({
       id: t.id,
       deltaDebt: (-1 * Number(t.deltaDebt)).toString(),
+      deltaCollateral: (-1 * Number(t.deltaCollateral)).toString(),
       safeHandler: t.srcHandler,
       createdAt: t.createdAt,
       createdAtBlock: t.createdAtBlock,
@@ -199,6 +206,7 @@ const getSafeModificationEvents = async (
     events.push({
       type: RewardEventType.DELTA_DEBT,
       value: Number(u.deltaDebt),
+      complementaryValue: Number(u.deltaCollateral),
       address: ownerMapping.get(u.safeHandler),
       logIndex: getLogIndexFromId(u.id),
       timestamp: Number(u.createdAt),

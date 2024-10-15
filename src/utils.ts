@@ -16,6 +16,7 @@ export const getOrCreateUser = (
     const newUser: UserAccount = {
       address,
       debt: 0,
+      collateral: 0,
       lpPositions: [],
       stakingWeight: 0,
       earned: 0,
