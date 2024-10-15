@@ -1,9 +1,9 @@
-import { zeroPad } from 'ethers/lib/utils';
-import { blockToTimestamp } from './chain';
-import { config } from './config';
-import { subgraphQueryPaginated } from './subgraph';
-import { RewardEvent, RewardEventType } from './types';
-import { getExclusionList, getSafeOwnerMapping, NULL_ADDRESS } from './utils';
+import { zeroPad } from "ethers/lib/utils";
+import { blockToTimestamp } from "./chain";
+import { config } from "./config";
+import { subgraphQueryPaginated } from "./subgraph";
+import { RewardEvent, RewardEventType } from "./types";
+import { getExclusionList, getSafeOwnerMapping, NULL_ADDRESS } from "./utils";
 
 export const getEvents = async (
   startBlock: number,
@@ -15,7 +15,7 @@ export const getEvents = async (
 
   const res = await Promise.all([
     getSafeModificationEvents(startBlock, endBlock, owners, cType),
-    getUpdateAccumulatedRateEvent(startBlock, endBlock, cType)
+    getUpdateAccumulatedRateEvent(startBlock, endBlock, cType),
   ]);
 
   // Merge all events
@@ -24,7 +24,9 @@ export const getEvents = async (
   // Filter out events involving the exclusion list
   // Remove accounts from the exclusion list
   const exclusionList = await getExclusionList();
-  events = events.filter(e => !e.address || !exclusionList.includes(e.address));
+  events = events.filter(
+    (e) => !e.address || !exclusionList.includes(e.address)
+  );
 
   // Sort first by timestamp then by logIndex
   events = events.sort((a, b) => {
@@ -84,7 +86,9 @@ const getSafeModificationEvents = async (
   type SubgraphSafeModification = {
     id: string;
     deltaDebt: string;
+    deltaCollateral: string;
     createdAt: string;
+    createdAtBlock: string;
     safeHandler: string;
     collateralType?: {
       id: string;
@@ -96,8 +100,10 @@ const getSafeModificationEvents = async (
       modifySAFECollateralizations(where: {createdAtBlock_gte: ${start}, collateralType: "${cType}", createdAtBlock_lte: ${end}, deltaDebt_not: 0}, first: 1000, skip: [[skip]]) {
         id
         deltaDebt
+        deltaCollateral
         safeHandler
         createdAt
+        createdAtBlock
         collateralType {
           id
         }
@@ -107,7 +113,7 @@ const getSafeModificationEvents = async (
   const safeModifications: SubgraphSafeModification[] =
     await subgraphQueryPaginated(
       safeModificationQuery,
-      'modifySAFECollateralizations',
+      "modifySAFECollateralizations",
       config().GEB_SUBGRAPH_URL
     );
 
@@ -116,8 +122,10 @@ const getSafeModificationEvents = async (
     confiscateSAFECollateralAndDebts(where: {createdAtBlock_gte: ${start}, collateralType: "${cType}", createdAtBlock_lte: ${end}, deltaDebt_not: 0}, first: 1000, skip: [[skip]]) {
       id
       deltaDebt
+      deltaCollateral
       safeHandler
       createdAt
+      createdAtBlock
       collateralType {
         id
       }
@@ -127,7 +135,7 @@ const getSafeModificationEvents = async (
   const confiscateSAFECollateralAndDebts: SubgraphSafeModification[] =
     await subgraphQueryPaginated(
       confiscateSAFECollateralAndDebtsQuery,
-      'confiscateSAFECollateralAndDebts',
+      "confiscateSAFECollateralAndDebts",
       config().GEB_SUBGRAPH_URL
     );
 
@@ -136,7 +144,9 @@ const getSafeModificationEvents = async (
     transferSAFECollateralAndDebts(where: {createdAtBlock_gte: ${start}, collateralType: "${cType}", createdAtBlock_lte: ${end}, deltaDebt_not: 0}, first: 1000, skip: [[skip]]) {
       id
       deltaDebt
+      deltaCollateral
       createdAt
+      createdAtBlock
       srcHandler
       dstHandler
       collateralType {
@@ -148,12 +158,14 @@ const getSafeModificationEvents = async (
   const transferSAFECollateralAndDebts: {
     id: string;
     deltaDebt: string;
+    deltaCollateral: string;
     createdAt: string;
+    createdAtBlock: string;
     srcHandler: string;
     dstHandler: string;
   }[] = await subgraphQueryPaginated(
     transferSAFECollateralAndDebtsQuery,
-    'transferSAFECollateralAndDebts',
+    "transferSAFECollateralAndDebts",
     config().GEB_SUBGRAPH_URL
   );
 
@@ -163,15 +175,19 @@ const getSafeModificationEvents = async (
     transferSAFECollateralAndDebtsProcessed.push({
       id: t.id,
       deltaDebt: t.deltaDebt,
+      deltaCollateral: t.deltaCollateral,
       safeHandler: t.dstHandler,
-      createdAt: t.createdAt
+      createdAt: t.createdAt,
+      createdAtBlock: t.createdAtBlock,
     });
 
     transferSAFECollateralAndDebtsProcessed.push({
       id: t.id,
       deltaDebt: (-1 * Number(t.deltaDebt)).toString(),
+      deltaCollateral: (-1 * Number(t.deltaCollateral)).toString(),
       safeHandler: t.srcHandler,
-      createdAt: t.createdAt
+      createdAt: t.createdAt,
+      createdAtBlock: t.createdAtBlock,
     });
   }
 
@@ -190,10 +206,12 @@ const getSafeModificationEvents = async (
     events.push({
       type: RewardEventType.DELTA_DEBT,
       value: Number(u.deltaDebt),
+      complementaryValue: Number(u.deltaCollateral),
       address: ownerMapping.get(u.safeHandler),
       logIndex: getLogIndexFromId(u.id),
       timestamp: Number(u.createdAt),
-      cType: u.collateralType?.id
+      createdAtBlock: Number(u.createdAtBlock),
+      cType: u.collateralType?.id,
     });
   }
 
@@ -213,6 +231,7 @@ const getUpdateAccumulatedRateEvent = async (
               id
               rateMultiplier
               createdAt
+              createdAtBlock
               collateralType {
                 id
               }
@@ -223,29 +242,31 @@ const getUpdateAccumulatedRateEvent = async (
     id: string;
     rateMultiplier: string;
     createdAt: string;
+    createdAtBlock: string;
     collateralType: { id: string };
   }[] = await subgraphQueryPaginated(
     query,
-    'updateAccumulatedRates',
+    "updateAccumulatedRates",
     config().GEB_SUBGRAPH_URL
   );
 
-  const events = data.map(x => ({
+  const events = data.map((x) => ({
     type: RewardEventType.UPDATE_ACCUMULATED_RATE,
     cType: x.collateralType.id,
     value: Number(x.rateMultiplier),
     logIndex: getLogIndexFromId(x.id),
-    timestamp: Number(x.createdAt)
+    timestamp: Number(x.createdAt),
+    createdAtBlock: Number(x.createdAtBlock),
   }));
   console.log(`  Fetched ${events.length} accumulated rate events`);
   return events;
 };
 
 const getLogIndexFromId = (id: string) => {
-  const matches = id.split('-');
+  const matches = id.split("-");
 
   if (matches.length < 2 || isNaN(Number(matches[1]))) {
-    throw Error('Invalid log index');
+    throw Error("Invalid log index");
   }
 
   return Number(matches[1]);

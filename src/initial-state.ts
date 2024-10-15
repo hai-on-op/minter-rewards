@@ -1,8 +1,8 @@
-import { config } from './config';
-import { subgraphQuery, subgraphQueryPaginated } from './subgraph';
-import { UserList } from './types';
-import { getExclusionList, getOrCreateUser } from './utils';
-import { CTYPES } from './rewards';
+import { config } from "./config";
+import { subgraphQuery, subgraphQueryPaginated } from "./subgraph";
+import { UserList } from "./types";
+import { getExclusionList, getOrCreateUser } from "./utils";
+import { CTYPES } from "./rewards";
 
 interface Rates {
   [key: string]: any; // or whatever type the values should be
@@ -67,7 +67,7 @@ const getInitialSafesDebt = async (
     };
   }[] = await subgraphQueryPaginated(
     debtQuery,
-    'safes',
+    "safes",
     config().GEB_SUBGRAPH_URL
   );
 
@@ -95,7 +95,7 @@ const getInitialSafesDebt = async (
     if (address !== undefined) {
       debts.push({
         address: address,
-        debt: Number(u.debt) * cRate
+        debt: Number(u.debt) * cRate,
       });
     }
   }
