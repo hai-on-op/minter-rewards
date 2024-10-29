@@ -21,51 +21,9 @@
     "bridgeTransactions": [
       {
         "bridgeName": "Standard Bridge",
-        "token": "ETH",
-        "amount": "4000000000000000000",
-        "blockHeight": 106297806
-      },
-      {
-        "bridgeName": "Standard Bridge",
-        "token": "0x15e770b95edd73fd96b02ece0266247d50895e76",
-        "amount": "183334419138006612204411",
-        "blockHeight": 106226152
-      },
-      {
-        "bridgeName": "Standard Bridge",
-        "token": "0x15e770b95edd73fd96b02ece0266247d50895e76",
-        "amount": "168204375436758415589388",
-        "blockHeight": 112330159
-      },
-      {
-        "bridgeName": "Standard Bridge",
-        "token": "0x6c2f7b6110a37b3b0fbdd811876be368df02e8b0",
-        "amount": "1157051754521454128",
-        "blockHeight": 106903937
-      },
-      {
-        "bridgeName": "Standard Bridge",
-        "token": "0x68f180fcce6836688e9084f035309e29bf0a2095",
-        "amount": "82532406",
-        "blockHeight": 111900131
-      },
-      {
-        "bridgeName": "Standard Bridge",
-        "token": "0x68f180fcce6836688e9084f035309e29bf0a2095",
-        "amount": "8462400",
-        "blockHeight": 123549169
-      },
-      {
-        "bridgeName": "Standard Bridge",
         "token": "0x68f180fcce6836688e9084f035309e29bf0a2095",
         "amount": "3679200",
         "blockHeight": 125969814
-      },
-      {
-        "bridgeName": "Standard Bridge",
-        "token": "0x2218a117083f5b482b0bb821d27056ba9c04b1d3",
-        "amount": "5431857125473570577393",
-        "blockHeight": 117718285
       },
       {
         "bridgeName": "Standard Bridge",
@@ -90,36 +48,12 @@
         "token": "apxETH",
         "amount": "14580143000000000000",
         "blockHeight": 125906853
-      },
-      {
-        "bridgeName": "Lido Bridge",
-        "token": "wstETH",
-        "amount": "4604872415420809615",
-        "blockHeight": 118108397
-      },
-      {
-        "bridgeName": "Lido Bridge",
-        "token": "wstETH",
-        "amount": "2000000000000000000",
-        "blockHeight": 119593519
       }
     ]
   },
   {
     "address": "0x9c0d1f4a029c46265831d120dee9cdc72f0ab3c3",
     "bridgeTransactions": [
-      {
-        "bridgeName": "Standard Bridge",
-        "token": "0xf1a0da3367bc7aa04f8d94ba57b862ff37ced174",
-        "amount": "350000000000000000000000",
-        "blockHeight": 113218666
-      },
-      {
-        "bridgeName": "Standard Bridge",
-        "token": "0xf1a0da3367bc7aa04f8d94ba57b862ff37ced174",
-        "amount": "350000000000000000000000",
-        "blockHeight": 113899163
-      },
       {
         "bridgeName": "apxETH Bridge",
         "token": "apxETH",
@@ -143,12 +77,6 @@
         "token": "apxETH",
         "amount": "4996688000000000000",
         "blockHeight": 125909919
-      },
-      {
-        "bridgeName": "Lido Bridge",
-        "token": "wstETH",
-        "amount": "29685199830351086278",
-        "blockHeight": 111782820
       }
     ]
   },
@@ -188,12 +116,17 @@
         "token": "apxETH",
         "amount": "5523044000000000000",
         "blockHeight": 125369553
-      },
+      }
+    ]
+  },
+  {
+    "address": "0x560ebafd8db62cbdb44b50539d65b48072b98277",
+    "bridgeTransactions": [
       {
-        "bridgeName": "Lido Bridge",
-        "token": "wstETH",
-        "amount": "18519182128184830140",
-        "blockHeight": 117438764
+        "bridgeName": "apxETH Bridge",
+        "token": "apxETH",
+        "amount": "40000000000000000000",
+        "blockHeight": 126529719
       }
     ]
   },
@@ -217,46 +150,6 @@
   {
     "address": "0xdd915bee3f0c808968e9e5e890d2cf36c76e8c8a",
     "bridgeTransactions": []
-  },
-  {
-    "address": "0x223c381a3aae44f7e073e66a8295dce2955e0098",
-    "bridgeTransactions": [
-      {
-        "bridgeName": "apxETH Bridge",
-        "token": "apxETH",
-        "amount": "666613000000000000",
-        "blockHeight": 125345517
-      },
-      {
-        "bridgeName": "Lido Bridge",
-        "token": "wstETH",
-        "amount": "12547234334360067611",
-        "blockHeight": 107068602
-      },
-      {
-        "bridgeName": "Lido Bridge",
-        "token": "wstETH",
-        "amount": "1000000000000000000",
-        "blockHeight": 107068440
-      },
-      {
-        "bridgeName": "Lido Bridge",
-        "token": "wstETH",
-        "amount": "16400096326266964086",
-        "blockHeight": 117434876
-      }
-    ]
-  },
-  {
-    "address": "0xf23f999ece302ea646509b51e6c4c19055471ab0",
-    "bridgeTransactions": [
-      {
-        "bridgeName": "apxETH Bridge",
-        "token": "apxETH",
-        "amount": "953245000000000000",
-        "blockHeight": 125092625
-      }
-    ]
   },
   {
     "address": "0x0556bdc524fcd2b8855eaacb1e10638b292a47a3",
@@ -287,6 +180,28 @@
     ]
   },
   {
+    "address": "0x223c381a3aae44f7e073e66a8295dce2955e0098",
+    "bridgeTransactions": [
+      {
+        "bridgeName": "apxETH Bridge",
+        "token": "apxETH",
+        "amount": "666613000000000000",
+        "blockHeight": 125345517
+      }
+    ]
+  },
+  {
+    "address": "0xf23f999ece302ea646509b51e6c4c19055471ab0",
+    "bridgeTransactions": [
+      {
+        "bridgeName": "apxETH Bridge",
+        "token": "apxETH",
+        "amount": "953245000000000000",
+        "blockHeight": 125092625
+      }
+    ]
+  },
+  {
     "address": "0x0a0d752f90b7bf700e29379c7f512c87561e959a",
     "bridgeTransactions": [
       {
@@ -313,22 +228,28 @@
     "bridgeTransactions": []
   },
   {
-    "address": "0x8caa7ebe5c6ae6087fb65315d1b5aa7acd33b854",
+    "address": "0x6d3b90747dbf5883bf88ff7eb5fcc86f408b5409",
     "bridgeTransactions": [
       {
         "bridgeName": "Standard Bridge",
-        "token": "0x7fb688ccf682d58f86d7e38e03f9d22e7705448b",
-        "amount": "3597215136802426007054",
-        "blockHeight": 117522098
+        "token": "ETH",
+        "amount": "10549649354892749452",
+        "blockHeight": 124917680
+      },
+      {
+        "bridgeName": "Standard Bridge",
+        "token": "ETH",
+        "amount": "36036943465971625999",
+        "blockHeight": 125042767
       }
     ]
   },
   {
-    "address": "0x3b528d4ab08ef019972e6bd7f40d55ab35c0846b",
+    "address": "0x8caa7ebe5c6ae6087fb65315d1b5aa7acd33b854",
     "bridgeTransactions": []
   },
   {
-    "address": "0x68e4174d3a61e6ae91bf8509535a6e75194e18bd",
+    "address": "0x3b528d4ab08ef019972e6bd7f40d55ab35c0846b",
     "bridgeTransactions": []
   },
   {
@@ -336,121 +257,35 @@
     "bridgeTransactions": []
   },
   {
+    "address": "0x68e4174d3a61e6ae91bf8509535a6e75194e18bd",
+    "bridgeTransactions": []
+  },
+  {
     "address": "0x48604a2f4b68fc4f66e5905a93ef2f0c983cfe78",
-    "bridgeTransactions": [
-      {
-        "bridgeName": "Standard Bridge",
-        "token": "ETH",
-        "amount": "300000000000000000",
-        "blockHeight": 122820663
-      },
-      {
-        "bridgeName": "Lido Bridge",
-        "token": "wstETH",
-        "amount": "48534491754305670276",
-        "blockHeight": 122821395
-      },
-      {
-        "bridgeName": "Lido Bridge",
-        "token": "wstETH",
-        "amount": "1000000000000000000",
-        "blockHeight": 122821221
-      }
-    ]
+    "bridgeTransactions": []
   },
   {
     "address": "0x1aabc59bb11c57577bdb423ece8e05e68955496c",
-    "bridgeTransactions": [
-      {
-        "bridgeName": "Standard Bridge",
-        "token": "0x68f180fcce6836688e9084f035309e29bf0a2095",
-        "amount": "514638425",
-        "blockHeight": 117795476
-      }
-    ]
+    "bridgeTransactions": []
   },
   {
     "address": "0x9aa00d3eadda7017f30bed9d483b873776bd251c",
-    "bridgeTransactions": [
-      {
-        "bridgeName": "Lido Bridge",
-        "token": "wstETH",
-        "amount": "29384017520887870340",
-        "blockHeight": 119382980
-      }
-    ]
-  },
-  {
-    "address": "0x1861974f32eacdcced0f81b0f8eccfed58153a9d",
-    "bridgeTransactions": [
-      {
-        "bridgeName": "Lido Bridge",
-        "token": "wstETH",
-        "amount": "14792761419737322753",
-        "blockHeight": 120657593
-      }
-    ]
-  },
-  {
-    "address": "0xe551388b683bb1e34e27e5a7b00eabe79b080bf7",
-    "bridgeTransactions": [
-      {
-        "bridgeName": "Standard Bridge",
-        "token": "0x7f5c764cbc14f9669b88837ca1490cca17c31607",
-        "amount": "4000000000",
-        "blockHeight": 105410733
-      },
-      {
-        "bridgeName": "Standard Bridge",
-        "token": "0x7f5c764cbc14f9669b88837ca1490cca17c31607",
-        "amount": "916503726",
-        "blockHeight": 105823771
-      },
-      {
-        "bridgeName": "Lido Bridge",
-        "token": "wstETH",
-        "amount": "15000000000000000000",
-        "blockHeight": 120454293
-      }
-    ]
-  },
-  {
-    "address": "0x99758478c660d48abf6ea0741b0fa34c91c6cf9a",
-    "bridgeTransactions": [
-      {
-        "bridgeName": "Standard Bridge",
-        "token": "ETH",
-        "amount": "20000000000000000",
-        "blockHeight": 120612940
-      },
-      {
-        "bridgeName": "Standard Bridge",
-        "token": "ETH",
-        "amount": "20000000000000000",
-        "blockHeight": 120612921
-      },
-      {
-        "bridgeName": "Lido Bridge",
-        "token": "wstETH",
-        "amount": "4024922335215404842",
-        "blockHeight": 120616874
-      },
-      {
-        "bridgeName": "Lido Bridge",
-        "token": "wstETH",
-        "amount": "19693000000000000000",
-        "blockHeight": 120615138
-      },
-      {
-        "bridgeName": "Lido Bridge",
-        "token": "wstETH",
-        "amount": "5137400000000000000",
-        "blockHeight": 120613018
-      }
-    ]
+    "bridgeTransactions": []
   },
   {
     "address": "0x6ec79f88fef67777c967084eded5cd0b368386fa",
+    "bridgeTransactions": []
+  },
+  {
+    "address": "0x1861974f32eacdcced0f81b0f8eccfed58153a9d",
+    "bridgeTransactions": []
+  },
+  {
+    "address": "0xe551388b683bb1e34e27e5a7b00eabe79b080bf7",
+    "bridgeTransactions": []
+  },
+  {
+    "address": "0x99758478c660d48abf6ea0741b0fa34c91c6cf9a",
     "bridgeTransactions": []
   },
   {
@@ -459,41 +294,11 @@
   },
   {
     "address": "0xe04885c3f1419c6e8495c33bdcf5f8387cd88846",
-    "bridgeTransactions": [
-      {
-        "bridgeName": "Standard Bridge",
-        "token": "ETH",
-        "amount": "1500000000000000000",
-        "blockHeight": 105504247
-      },
-      {
-        "bridgeName": "Standard Bridge",
-        "token": "ETH",
-        "amount": "200000000000000000",
-        "blockHeight": 111750493
-      },
-      {
-        "bridgeName": "Standard Bridge",
-        "token": "0x01b8b6384298d4848e3be63d4c9d17830eee488a",
-        "amount": "400000000000000000000",
-        "blockHeight": 105504001
-      }
-    ]
+    "bridgeTransactions": []
   },
   {
     "address": "0x71d9dcbcf5b7656e22163a404ab3a07a70aeb7e4",
     "bridgeTransactions": []
-  },
-  {
-    "address": "0x59503b4b2d50b8f6229196f87ecf4026f30fcf5e",
-    "bridgeTransactions": [
-      {
-        "bridgeName": "Lido Bridge",
-        "token": "wstETH",
-        "amount": "13153368135087729728",
-        "blockHeight": 117090874
-      }
-    ]
   },
   {
     "address": "0x7527546e1ec848ffb35b0474ee3331809ffab8dd",
@@ -505,6 +310,10 @@
   },
   {
     "address": "0x3e7dd7df9c1ffd12b8ecd94a27472bdc4d87ab7e",
+    "bridgeTransactions": []
+  },
+  {
+    "address": "0x59503b4b2d50b8f6229196f87ecf4026f30fcf5e",
     "bridgeTransactions": []
   },
   {
@@ -529,33 +338,10 @@
   },
   {
     "address": "0xbf701bd8befb759da62c158f1391e5539f828adb",
-    "bridgeTransactions": [
-      {
-        "bridgeName": "Standard Bridge",
-        "token": "ETH",
-        "amount": "1800000000000000000",
-        "blockHeight": 121566790
-      },
-      {
-        "bridgeName": "Lido Bridge",
-        "token": "wstETH",
-        "amount": "2463700000000000000",
-        "blockHeight": 121565685
-      },
-      {
-        "bridgeName": "Lido Bridge",
-        "token": "wstETH",
-        "amount": "100000000000000000",
-        "blockHeight": 121565511
-      }
-    ]
-  },
-  {
-    "address": "0x79d31bfca5fda7a4f15b36763d2e44c99d811a6c",
     "bridgeTransactions": []
   },
   {
-    "address": "0x2a31ce4806ba88843691c2aacc4de8999ab90444",
+    "address": "0x79d31bfca5fda7a4f15b36763d2e44c99d811a6c",
     "bridgeTransactions": []
   },
   {
@@ -564,14 +350,15 @@
   },
   {
     "address": "0x02e7b714fae84e4ba80f3cda5508553e7cf5042a",
-    "bridgeTransactions": [
-      {
-        "bridgeName": "Standard Bridge",
-        "token": "0xc52d7f23a2e460248db6ee192cb23dd12bddcbf6",
-        "amount": "2440389101956391929113",
-        "blockHeight": 120153370
-      }
-    ]
+    "bridgeTransactions": []
+  },
+  {
+    "address": "0x2a31ce4806ba88843691c2aacc4de8999ab90444",
+    "bridgeTransactions": []
+  },
+  {
+    "address": "0x7b9f28c10701f4ea08c0b13c57b7a5a648922a13",
+    "bridgeTransactions": []
   },
   {
     "address": "0xdc8a96b43cb8c16b06526520b049aec465475116",
@@ -579,10 +366,6 @@
   },
   {
     "address": "0x5e3c72ee812153e03e0b71f3c9dc6ff5380862c0",
-    "bridgeTransactions": []
-  },
-  {
-    "address": "0x7b9f28c10701f4ea08c0b13c57b7a5a648922a13",
     "bridgeTransactions": []
   },
   {
