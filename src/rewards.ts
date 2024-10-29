@@ -1,23 +1,23 @@
-import { config } from "./config";
-import { getAccumulatedRate } from "./initial-state";
+import { config } from './config';
+import { getAccumulatedRate } from './initial-state';
 import {
   LpPosition,
   RewardEvent,
   RewardEventType,
   UserAccount,
   UserList,
-  Rates,
-} from "./types";
-import { getOrCreateUser } from "./utils";
-import { provider } from "./chain";
-import { sanityCheckAllUsers } from "./sanity-checks";
-import { getStakingWeight } from "./staking-weight";
-import { getPoolState, getRedemptionPriceFromTimestamp } from "./subgraph";
-import * as fs from "fs";
-import { get } from "http";
-import { getBridgedTokensAtBlock } from "./bridge/getBridgedTokensAtBlock";
+  Rates
+} from './types';
+import { getOrCreateUser } from './utils';
+import { provider } from './chain';
+import { sanityCheckAllUsers } from './sanity-checks';
+import { getStakingWeight } from './staking-weight';
+import { getPoolState, getRedemptionPriceFromTimestamp } from './subgraph';
+import * as fs from 'fs';
+import { get } from 'http';
+import { getBridgedTokensAtBlock } from './bridge/getBridgedTokensAtBlock';
 
-export const CTYPES = ["WSTETH", "RETH", "APXETH"];
+export const CTYPES = ['WSTETH', 'WETH', 'TBTC', 'RETH', 'OP', 'APXETH'];
 
 export const processRewardEvent = async (
   users: UserList,
@@ -72,7 +72,7 @@ export const processRewardEvent = async (
   console.log(
     `Distributing ${rewardAmount} at a reward rate of ${rewardRate}/sec between ${startTimestamp} and ${endTimestamp}`
   );
-  console.log("Applying all events...");
+  console.log('Applying all events...');
   // Main processing loop processing events in chronologic order that modify the current reward rate distribution for each user.
 
   for (let i = 0; i < events.length; i++) {
@@ -96,7 +96,7 @@ export const processRewardEvent = async (
     // The way the rewards are credited is different for each event type
     switch (event.type) {
       case RewardEventType.DELTA_DEBT: {
-        const user = getOrCreateUser(event.address ?? "", users);
+        const user = getOrCreateUser(event.address ?? '', users);
         earn(user, rewardPerWeight);
 
         // setting user totalBridgedTokens
@@ -136,7 +136,7 @@ export const processRewardEvent = async (
 
         // setting user totalBridgedTokens
         Object.values(users).map(
-          (u) =>
+          u =>
             (u.totalBridgedTokens = getBridgedTokensAtBlock(
               u.address,
               event.cType,
@@ -145,12 +145,12 @@ export const processRewardEvent = async (
         );
 
         // First credit all users
-        Object.values(users).map((u) => earn(u, rewardPerWeight));
+        Object.values(users).map(u => earn(u, rewardPerWeight));
 
         // Update everyone's debt
-        Object.values(users).map((u) => (u.debt *= rateMultiplier + 1));
+        Object.values(users).map(u => (u.debt *= rateMultiplier + 1));
 
-        Object.values(users).map((u) => {
+        Object.values(users).map(u => {
           // calculating userEffectiveBridgedTokens
           const userEffectiveBridgedTokens = u.totalBridgedTokens; //- u.usedBridgedTokens;
 
@@ -164,7 +164,7 @@ export const processRewardEvent = async (
         break;
       }
       default:
-        throw Error("Unknown event");
+        throw Error('Unknown event');
     }
 
     sanityCheckAllUsers(users, event);
@@ -184,7 +184,7 @@ export const processRewardEvent = async (
 
   // Final crediting of all rewards
   updateRewardPerWeight(endTimestamp);
-  Object.values(users).map((u) => earn(u, rewardPerWeight));
+  Object.values(users).map(u => earn(u, rewardPerWeight));
 
   return users;
 };

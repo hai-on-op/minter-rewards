@@ -1,4 +1,5 @@
 node_modules/
+output/*
 .env
 rewards.csv
 gcp_key.json
