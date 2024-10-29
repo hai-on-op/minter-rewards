@@ -1,4 +1,4 @@
-import { LpPosition } from './types';
+import { LpPosition } from "./types";
 
 const RAI_IS_TOKEN_0 = true;
 
@@ -8,11 +8,25 @@ const fullRangeUpperTick = 887220;
 
 export const getStakingWeight = (
   debt: number,
-  positions: LpPosition[],
-  sqrtPrice: number,
-  redemptionPrice: number
+  collateral: number,
+  effectiveBridgedTokens: number,
+  withBridge: boolean
 ): number => {
-  return debt;
+  if (!withBridge) {
+    return debt;
+  }
+
+  // Calculate the ratio of bridged collateral to total collateral
+  const bridgedRatio =
+    effectiveBridgedTokens === 0 && collateral === 0
+      ? 0
+      : Math.min(effectiveBridgedTokens / collateral, 1);
+
+  // Calculate the rewardable debt
+  const rewardableDebt = Math.min(debt, debt * bridgedRatio);
+
+  return rewardableDebt;
+
   // Remove positions that are not full range
   // const filteredPositions = positions.filter(p => {
   //   return (

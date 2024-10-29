@@ -15,13 +15,15 @@ import { getStakingWeight } from './staking-weight';
 import { getPoolState, getRedemptionPriceFromTimestamp } from './subgraph';
 import * as fs from 'fs';
 import { get } from 'http';
+import { getBridgedTokensAtBlock } from './bridge/getBridgedTokensAtBlock';
 
-export const CTYPES = ['OP', 'WETH', 'WSTETH'];
+export const CTYPES = ['WSTETH', 'WETH', 'TBTC', 'RETH', 'OP', 'APXETH'];
 
 export const processRewardEvent = async (
   users: UserList,
   events: RewardEvent[],
-  rewardAmount: number
+  rewardAmount: number,
+  withBridge: boolean
 ): Promise<UserList> => {
   // Starting and ending of the campaign
   const startBlock = config().START_BLOCK;
@@ -86,6 +88,8 @@ export const processRewardEvent = async (
 
     updateRewardPerWeight(event.timestamp);
 
+    const rewardsDistributed = rewardRate * (event.timestamp - startTimestamp);
+
     // Increment time
     timestamp = event.timestamp;
 
@@ -95,22 +99,33 @@ export const processRewardEvent = async (
         const user = getOrCreateUser(event.address ?? '', users);
         earn(user, rewardPerWeight);
 
+        // setting user totalBridgedTokens
+        user.totalBridgedTokens = getBridgedTokensAtBlock(
+          event.address,
+          event.cType,
+          event.createdAtBlock
+        );
+
         const accumulatedRate = rates[event.cType as string];
 
         // Convert to real debt after interests and update the debt balance
         const adjustedDeltaDebt = (event.value as number) * accumulatedRate;
         user.debt += adjustedDeltaDebt;
 
+        user.collateral += event.complementaryValue;
+
         // Ignore Dusty debt
         if (user.debt < 0 && user.debt > -0.4) {
           user.debt = 0;
         }
+
         user.stakingWeight = getStakingWeight(
           user.debt,
-          user.lpPositions,
-          sqrtPrice,
-          redemptionPrice
+          user.collateral,
+          user.totalBridgedTokens,
+          withBridge
         );
+
         break;
       }
       case RewardEventType.UPDATE_ACCUMULATED_RATE: {
@@ -119,21 +134,33 @@ export const processRewardEvent = async (
         const cTypeRate = rates[event.cType as string];
         rates[event.cType as string] = cTypeRate + rateMultiplier;
 
+        // setting user totalBridgedTokens
+        Object.values(users).map(
+          u =>
+            (u.totalBridgedTokens = getBridgedTokensAtBlock(
+              u.address,
+              event.cType,
+              event.createdAtBlock
+            ))
+        );
+
         // First credit all users
         Object.values(users).map(u => earn(u, rewardPerWeight));
 
         // Update everyone's debt
         Object.values(users).map(u => (u.debt *= rateMultiplier + 1));
 
-        Object.values(users).map(
-          u =>
-            (u.stakingWeight = getStakingWeight(
-              u.debt,
-              u.lpPositions,
-              sqrtPrice,
-              redemptionPrice
-            ))
-        );
+        Object.values(users).map(u => {
+          // calculating userEffectiveBridgedTokens
+          const userEffectiveBridgedTokens = u.totalBridgedTokens; //- u.usedBridgedTokens;
+
+          u.stakingWeight = getStakingWeight(
+            u.debt,
+            u.collateral,
+            userEffectiveBridgedTokens,
+            withBridge
+          );
+        });
         break;
       }
       default:
@@ -151,6 +178,7 @@ export const processRewardEvent = async (
     // )},${users[u].stakingWeight},${totalStakingWeight},${users[u].earned}\n`)
 
     // Recalculate the sum of weights since the events the weights
+
     totalStakingWeight = sumAllWeights(users);
   }
 
@@ -173,4 +201,6 @@ const earn = (user: UserAccount, rewardPerWeight: number) => {
 
 // Simply sum all the stakingWeight of all users
 const sumAllWeights = (users: UserList) =>
-  Object.values(users).reduce((acc, user) => acc + user.stakingWeight, 0);
+  Object.values(users).reduce((acc, user) => {
+    return acc + user.stakingWeight;
+  }, 0);
