@@ -25,6 +25,7 @@ const main = async () => {
 
   const config = JSON.parse(envConfig().CONFIG);
   const owners = await getSafeOwnerMapping(envConfig().END_BLOCK);
+
   const rewardTokens = Object.keys(config);
   for (let i = 0; i < rewardTokens.length; i++) {
     const rewardToken = rewardTokens[i];
@@ -53,7 +54,6 @@ const main = async () => {
       await processRewardEvent(users, events, rewardAmount, withBridge);
 
       await exportResults(users, rewardToken, cType);
-      console.log("----------------------------------------");
     }
   }
 };

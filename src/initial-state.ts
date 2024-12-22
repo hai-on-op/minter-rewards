@@ -25,6 +25,7 @@ export const getInitialState = async (
   for (let debt of debts) {
     const user = getOrCreateUser(debt.address, users);
     user.debt += debt.debt;
+    user.collateral += debt.collateral;
     users[debt.address] = user;
   }
 
@@ -58,9 +59,10 @@ const getInitialSafesDebt = async (
   ownerMapping: Map<string, string>,
   cType: string
 ) => {
-  const debtQuery = `{safes(where: {debt_gt: 0, collateralType: "${cType}"}, first: 1000, skip: [[skip]],block: {number:${startBlock}}) {debt, safeHandler, collateralType {id}}}`;
+  const debtQuery = `{safes(where: {debt_gt: 0, collateralType: "${cType}"}, first: 1000, skip: [[skip]],block: {number:${startBlock}}) {debt, collateral, safeHandler, collateralType {id}}}`;
   const debtsGraph: {
     debt: number;
+    collateral: number;
     safeHandler: string;
     collateralType: {
       id: string;
@@ -82,7 +84,7 @@ const getInitialSafesDebt = async (
     rates[cType] = cTypeRate;
   }
 
-  let debts: { address: string; debt: number }[] = [];
+  let debts: { address: string; debt: number; collateral: number }[] = [];
   for (let u of debtsGraph) {
     if (!ownerMapping.has(u.safeHandler)) {
       console.log(`Safe handler ${u.safeHandler} has no owner`);
@@ -96,6 +98,7 @@ const getInitialSafesDebt = async (
       debts.push({
         address: address,
         debt: Number(u.debt) * cRate,
+        collateral: Number(u.collateral),
       });
     }
   }

@@ -1,7 +1,7 @@
-import { getAccumulatedRate } from './initial-state';
-import { NULL_ADDRESS, roundToZero } from './utils';
-import { provider } from './chain';
-import { RewardEvent, UserList } from './types';
+import { getAccumulatedRate } from "./initial-state";
+import { NULL_ADDRESS, roundToZero } from "./utils";
+import { provider } from "./chain";
+import { RewardEvent, UserList } from "./types";
 
 export const finalSanityChecks = async (
   finalTimestamp: number,
@@ -13,7 +13,7 @@ export const finalSanityChecks = async (
 ) => {
   const endTimestamp = (await provider.getBlock(endBlock)).timestamp;
   if (finalTimestamp > endTimestamp) {
-    throw Error('Impossible final timestamp');
+    throw Error("Impossible final timestamp");
   }
 
   // const expectedAccumulatedRate = await getAccumulatedRate(endBlock);
@@ -49,6 +49,7 @@ export const sanityCheckAllUsers = (users: UserList, event: RewardEvent) => {
   const numberCheck = (num: number) => !isFinite(num) || num < 0;
   if (event.address && event.address !== NULL_ADDRESS) {
     const usr = users[event.address];
+
     if (
       numberCheck(usr.debt) ||
       numberCheck(usr.stakingWeight) ||
