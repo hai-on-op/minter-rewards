@@ -17,7 +17,7 @@ import * as fs from "fs";
 import { get } from "http";
 import { getBridgedTokensAtBlock } from "./bridge/getBridgedTokensAtBlock";
 
-export const CTYPES = ["WSTETH", "RETH", "APXETH"];
+export const CTYPES = ["WSTETH", "TBTC", "WETH", "OP", "RETH", "APXETH"];
 
 export const processRewardEvent = async (
   users: UserList,
