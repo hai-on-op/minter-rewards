@@ -25,6 +25,10 @@ export const processRewardEvent = async (
   rewardAmount: number,
   withBridge: boolean
 ): Promise<UserList> => {
+  const eventsBasedUsers = events
+    .filter(e => e.address)
+    .map(e => e.address) as string[];
+
   // Starting and ending of the campaign
   const startBlock = config().START_BLOCK;
   const endBlock = config().END_BLOCK;

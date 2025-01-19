@@ -1,8 +1,8 @@
-import { config } from "./config";
-import { subgraphQuery, subgraphQueryPaginated } from "./subgraph";
-import { UserList } from "./types";
-import { getExclusionList, getOrCreateUser } from "./utils";
-import { CTYPES } from "./rewards";
+import { config } from './config';
+import { subgraphQuery, subgraphQueryPaginated } from './subgraph';
+import { UserList } from './types';
+import { getExclusionList, getOrCreateUser } from './utils';
+import { CTYPES } from './rewards';
 
 interface Rates {
   [key: string]: any; // or whatever type the values should be
@@ -25,6 +25,7 @@ export const getInitialState = async (
   for (let debt of debts) {
     const user = getOrCreateUser(debt.address, users);
     user.debt += debt.debt;
+    user.collateral += debt.collateral;
     users[debt.address] = user;
   }
 
@@ -58,8 +59,9 @@ const getInitialSafesDebt = async (
   ownerMapping: Map<string, string>,
   cType: string
 ) => {
-  const debtQuery = `{safes(where: {debt_gt: 0, collateralType: "${cType}"}, first: 1000, skip: [[skip]],block: {number:${startBlock}}) {debt, safeHandler, collateralType {id}}}`;
+  const debtQuery = `{safes(where: {debt_gt: 0, collateralType: "${cType}"}, first: 1000, skip: [[skip]],block: {number:${startBlock}}) {debt, collateral, safeHandler, collateralType {id}}}`;
   const debtsGraph: {
+    collateral(collateral: any): number;
     debt: number;
     safeHandler: string;
     collateralType: {
@@ -67,7 +69,7 @@ const getInitialSafesDebt = async (
     };
   }[] = await subgraphQueryPaginated(
     debtQuery,
-    "safes",
+    'safes',
     config().GEB_SUBGRAPH_URL
   );
 
@@ -82,7 +84,11 @@ const getInitialSafesDebt = async (
     rates[cType] = cTypeRate;
   }
 
-  let debts: { address: string; debt: number }[] = [];
+  let debts: {
+    collateral: number;
+    address: string;
+    debt: number;
+  }[] = [];
   for (let u of debtsGraph) {
     if (!ownerMapping.has(u.safeHandler)) {
       console.log(`Safe handler ${u.safeHandler} has no owner`);
@@ -96,6 +102,7 @@ const getInitialSafesDebt = async (
       debts.push({
         address: address,
         debt: Number(u.debt) * cRate,
+        collateral: Number(u.collateral)
       });
     }
   }
